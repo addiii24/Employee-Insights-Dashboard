@@ -6,20 +6,26 @@ const Datafetch = ({ changeuser }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [scrollTop, setScrollTop] = useState(0);
 
+  // New states for infinite scroll
+  const [start, setStart] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+
   // Constants for Virtualization
   const itemHeight = 72; // Height of each row based on your design
   const containerHeight = 500; // Fixed view window
   const buffer = 4;
+  const itemsPerPage = 20;
   
-useEffect(() => {
-  const fetchEmployees = async () => {
+  const fetchEmployees = async (startIndex) => {
     try {
       const payload = {
         username: "test",
         password: "123456",
         draw: "1",
-        start: "0",
-        length: "40",
+        start: startIndex.toString(),
+        length: itemsPerPage.toString(),
         table: "employee",
         action: "fetch"
       };
@@ -34,26 +40,54 @@ useEffect(() => {
 
       const result = await response.json();
       if (result && result.TABLE_DATA && result.TABLE_DATA.data) {
-        const formattedData = result.TABLE_DATA.data.map(emp => ({
-          name: emp[0],
-          role: emp[1],
-          city: emp[2],
-          id: emp[3],
-          startDate: emp[4],
-          salary: emp[5].replace('$', '').replace(',', '') // optional: format salary if needed by UI
-        }));
-        setEmployees(formattedData);
+        const newData = result.TABLE_DATA.data;
+        if (newData.length === 0) {
+          setHasMore(false);
+        } else {
+          const formattedData = newData.map(emp => ({
+            name: emp[0],
+            role: emp[1],
+            city: emp[2],
+            id: emp[3],
+            startDate: emp[4],
+            salary: emp[5].replace('$', '').replace(',', '')
+          }));
+          
+          setEmployees(prev => [...prev, ...formattedData]);
+          setStart(prev => prev + itemsPerPage);
+        }
+      } else {
+        setHasMore(false);
       }
     } catch (err) {
       console.error("Fetch error:", err);
+      setHasMore(false);
+    } finally {
+      setLoadingMore(false);
+      setInitialLoading(false);
     }
   };
-  fetchEmployees();
-}, []);
+
+  useEffect(() => {
+    fetchEmployees(0);
+  }, []);
 
   // --- Virtualization Math ---
   const handleScroll = (e) => {
     setScrollTop(e.target.scrollTop);
+
+    // Infinite scroll detection
+    if (loadingMore || !hasMore) return;
+
+    const { scrollTop, clientHeight, scrollHeight } = e.target;
+    // Check if user has scrolled to the bottom (with a 10px buffer)
+    if (scrollHeight - scrollTop <= clientHeight + 10) {
+      setLoadingMore(true);
+      // Simulate a 3s buffer delay before fetching the next 20
+      setTimeout(() => {
+        fetchEmployees(start);
+      }, 3000);
+    }
   };
 
   const filteredData = employees.filter(emp => 
@@ -84,13 +118,12 @@ useEffect(() => {
           
           <div className="flex items-center gap-3">
             <div className="relative">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
               <input 
                 type="text"
                 placeholder="Search employees..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-sm focus:ring-2 focus:ring-[#136dec] outline-none w-full sm:w-64"
+                className="pl-10 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-sm focus:ring-2 focus:ring-[#136dec] outline-none w-full sm:w-64 placeholder:text-slate-400 text-white"
               />
             </div>
           </div>
@@ -148,11 +181,25 @@ useEffect(() => {
             </div>
           </div>
 
-          {/* Table Footer Stats */}
-          <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/30">
+          {/* Table Footer Stats & Loading Indicator */}
+          <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/30 flex justify-between items-center">
             <span className="text-sm text-slate-500">
-              Showing {visibleSlice.length} of {filteredData.length} employees
+              Showing {employees.length} employees {searchTerm && '(filtered)'}
             </span>
+            
+            {loadingMore && (
+              <div className="flex items-center gap-2 text-sm text-[#136dec] font-medium animate-pulse">
+                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Buffering more data...
+              </div>
+            )}
+            
+            {!hasMore && employees.length > 0 && (
+              <span className="text-sm font-medium text-slate-400">All data loaded</span>
+            )}
           </div>
         </div>
       </main>
