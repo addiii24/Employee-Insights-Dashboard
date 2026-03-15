@@ -1,13 +1,15 @@
-const credentials = [{
-    username: "testuser",
-    password: 123
-}];
+const credentials = [
+    {
+        username: "testuser",
+        password: "123", // Set as string for easier comparison
+    }
+];
 
 export const setlocalstorage = () => {
-    JSON.parse(localStorage.setItem("credentials"));
+    localStorage.setItem("credentials", JSON.stringify(credentials));
 }
 
 export const getlocalstorage = () => {
-    const credentials = JSON.parse(localStorage.getItem("credentials"));
-    return {credentials};
+    const data = localStorage.getItem("credentials");
+    return data ? JSON.parse(data) : credentials; 
 }

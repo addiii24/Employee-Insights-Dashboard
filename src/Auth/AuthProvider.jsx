@@ -10,7 +10,7 @@ const AuthProvider = ({children}) => {
 
    useEffect(() => {
     const credentials = getlocalstorage();
-    setuserdata(credentials)
+    setuserdata(credentials )
 
    }, [])
    
