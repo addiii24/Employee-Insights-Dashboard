@@ -1,5 +1,5 @@
 import React from 'react';
-import { setLocalstorage } from '../Utils/Localstorage.jsx';
+// import { setLocalstorage } from '../Utils/Localstorage.jsx';
 
 
 
@@ -20,10 +20,10 @@ const Header =() => {
                 </h1>
             </div>
             <button 
-                onClick={() => {
-                    localStorage.clear();
-                    window.location.reload(); 
-                }}
+                // onClick={() => {
+                //     localStorage.clear();
+                //     window.location.reload(); 
+                // }}
                 className="bg-red-500 hover:bg-red-600 text-white font-semibold px-6 py-2 rounded-lg transition-all active:scale-95 shadow-lg shadow-red-900/20"
             >
                 Log Out

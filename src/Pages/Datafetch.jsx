@@ -1,5 +1,5 @@
 import React from 'react'
-import Header from '../Header.jsx'
+import Header from '../Others/Header.jsx'
 
 const Datafetch = () => {
   return (
@@ -9,4 +9,4 @@ const Datafetch = () => {
   )
 }
 
-export default Datafetch
+export default Datafetch;
