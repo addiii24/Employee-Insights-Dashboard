@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function Login({ handleLogin }) {
+const Login   =({ handleLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -14,7 +14,7 @@ function Login({ handleLogin }) {
   return (
     <div className="font-sans bg-[#f6f7f8] dark:bg-[#101822] min-h-screen flex items-center justify-center p-4 w-full">
       <div className="w-full max-w-md">
-        
+
         <div className="flex flex-col items-center mb-8">
           <h1 className="text-slate-900 dark:text-slate-100 text-3xl font-bold tracking-tight text-center">
             Employee Insights Dashboard
