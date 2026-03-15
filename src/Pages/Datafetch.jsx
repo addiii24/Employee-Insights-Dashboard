@@ -10,24 +10,46 @@ const Datafetch = ({ changeuser }) => {
   const itemHeight = 72; // Height of each row based on your design
   const containerHeight = 500; // Fixed view window
   const buffer = 4;
+  
+useEffect(() => {
+  const fetchEmployees = async () => {
+    try {
+      const payload = {
+        username: "test",
+        password: "123456",
+        draw: "1",
+        start: "0",
+        length: "40",
+        table: "employee",
+        action: "fetch"
+      };
 
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await fetch('https://backend.jotish.in/backend_dev/gettabledata.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ "username": "test", "password": "123" })
-        });
-        const result = await response.json();
-        // Assuming API returns { data: [...] }
-        setEmployees(result.data || []);
-      } catch (err) {
-        console.error("Fetch error:", err);
+      const response = await fetch('/api/backend_dev/gettabledata.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+      if (result && result.TABLE_DATA && result.TABLE_DATA.data) {
+        const formattedData = result.TABLE_DATA.data.map(emp => ({
+          name: emp[0],
+          role: emp[1],
+          city: emp[2],
+          id: emp[3],
+          startDate: emp[4],
+          salary: emp[5].replace('$', '').replace(',', '') // optional: format salary if needed by UI
+        }));
+        setEmployees(formattedData);
       }
-    };
-    fetchEmployees();
-  }, []);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    }
+  };
+  fetchEmployees();
+}, []);
 
   // --- Virtualization Math ---
   const handleScroll = (e) => {
