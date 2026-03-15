@@ -15,7 +15,7 @@ const Header =(props) => {
                 <h1 className="text-xl font-medium text-gray-400">
                     Hello, <br />
                     <span className="text-3xl font-bold text-white leading-tight">
-                        {props.data.username}<span className="inline-block hover:rotate-12 transition-transform cursor-default">👋</span>
+                        testuser<span className="inline-block hover:rotate-12 transition-transform cursor-default">👋</span>
                     </span>
                 </h1>
             </div>

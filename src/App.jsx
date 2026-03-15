@@ -39,11 +39,12 @@ const App = () => {
 
   return (
     <div>
-      {!user ? <Login handleLogin={handleLogin} /> : ''}
-      {user == 'testuser' ? <Datafetch Changeuser = {setuser} data={loggedinuserdata} /> : null}
+      {/* {!user ? <Login handleLogin={handleLogin} /> : ''}
+      {user == 'testuser' ? <Datafetch Changeuser = {setuser} data={loggedinuserdata} /> : null} */}
       {/* <Login /> */}
-      {/* <Datafetch /> */}
+      <Datafetch />
       {/* <Header/> */}
+
     </div>
   )
 }
