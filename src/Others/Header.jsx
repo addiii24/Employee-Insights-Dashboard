@@ -1,14 +1,14 @@
 import React from 'react';
-// import { setLocalstorage } from '../Utils/Localstorage.jsx';
+import { setlocalstorage } from '../Utils/Localstorage.jsx';
 
 
 
 const Header =(props) => {
 
-//     const Logoutuser = () => {
-//     localStorage.setItem('loggedinUser',' ')
-//     props.Changeuser(' ')
-// }
+    const Logoutuser = () => {
+    localStorage.setItem('loggedinUser',' ')
+    props.Changeuser(' ')
+}
     return (
         <div className="flex justify-between items-center p-8 bg-[#111] border-b border-emerald-500/10">
             <div>

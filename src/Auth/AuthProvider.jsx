@@ -1,5 +1,5 @@
 import React, { createContext } from 'react'
-import { getLocalstorage } from '../Utils/Localstorage.jsx'
+import { getlocalstorage } from '../Utils/Localstorage.jsx'
 import { useEffect, useState } from 'react'
 
 
@@ -9,7 +9,7 @@ const AuthProvider = ({children}) => {
    const [userdata, setuserdata] = useState(null)
 
    useEffect(() => {
-    const credentials = getLocalstorage()
+    const credentials = getlocalstorage();
     setuserdata(credentials)
 
    }, [])
