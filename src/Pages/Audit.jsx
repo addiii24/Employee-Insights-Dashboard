@@ -1,11 +1,12 @@
 import React, { useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import SignatureCanvas from 'react-signature-canvas';
 import Header from '../Others/Header.jsx';
 import { Link } from 'react-router-dom';
 
 const Audit = ({ changeuser }) => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [capturedImg, setCapturedImg] = useState(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const videoRef = useRef(null);
@@ -61,7 +62,10 @@ const Audit = ({ changeuser }) => {
               id: id, audit_image: finalData
             })
           });
+          // Save the final image to localStorage for the Analytics page to use
+          localStorage.setItem('auditImage', finalData);
           alert("Audit Verified and Saved!");
+          navigate('/analytics');
         } catch (e) { console.error(e); }
       };
     };
@@ -91,7 +95,7 @@ const Audit = ({ changeuser }) => {
             <SignatureCanvas ref={sigPad} penColor="black" canvasProps={{ className: 'w-full h-48' }} />
           </div>
           <button onClick={handleFinalMerge} disabled={!capturedImg} className="w-full py-3 bg-indigo-600 rounded-lg font-bold">
-          <Link to= {'/analytics'} > Complete Audit </Link>
+            Complete Audit
           </button>
         </div>
       </div>
