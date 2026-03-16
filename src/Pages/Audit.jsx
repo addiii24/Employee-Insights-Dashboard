@@ -49,24 +49,33 @@ const Audit = ({ changeuser }) => {
       sigImg.src = sigPad.current.getTrimmedCanvas().toDataURL('image/png');
       
       sigImg.onload = async () => {
-        ctx.drawImage(sigImg, mainCanvas.width - 250, mainCanvas.height - 150, 200, 100);
-        const finalData = mainCanvas.toDataURL('image/jpeg', 0.8);
-        
-        // Final upload using fetch
         try {
-          await fetch('https://backend.jotish.in/backend_dev/gettabledata.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              username: "test", password: "123456",
-              id: id, audit_image: finalData
-            })
-          });
-          // Save the final image to localStorage for the Analytics page to use
+          ctx.drawImage(sigImg, mainCanvas.width - 250, mainCanvas.height - 150, 200, 100);
+          const finalData = mainCanvas.toDataURL('image/jpeg', 0.8);
+          
+          // Save the final image to localStorage for the Analytics page to use first
           localStorage.setItem('auditImage', finalData);
+          
+          // Final upload using fetch - don't let this block UI if it fails
+          try {
+            await fetch('https://backend.jotish.in/backend_dev/gettabledata.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                username: "test", password: "123456",
+                id: id, audit_image: finalData
+              })
+            });
+          } catch (e) {
+            console.error('Failed to save to backend but image captured locally:', e);
+          }
           alert("Audit Verified and Saved!");
           navigate('/analytics');
-        } catch (e) { console.error(e); }
+          
+        } catch (error) {
+          console.error("Error during merge:", error);
+          alert("Failed to process image. Please try again.");
+        }
       };
     };
   };
