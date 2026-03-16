@@ -6,6 +6,7 @@ import { AuthContext } from './Auth/AuthProvider.jsx'
 import { useContext } from 'react'
 import { useState } from 'react'
 import { useEffect } from 'react'
+import Audit from './Pages/Audit.jsx'
 
 const App = () => {
 
@@ -42,8 +43,9 @@ const App = () => {
       {/* {!user ? <Login handleLogin={handleLogin} /> : ''}
       {user == 'testuser' ? <Datafetch Changeuser = {setuser} data={loggedinuserdata} /> : null} */}
       {/* <Login /> */}
-      <Datafetch />
+      {/* <Datafetch /> */}
       {/* <Header/> */}
+      <Audit/>
 
     </div>
   )
