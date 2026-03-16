@@ -1,22 +1,18 @@
-import React from 'react'
+import React, { useState, useEffect, useContext } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './Pages/Login.jsx'
 import Datafetch from './Pages/Datafetch.jsx'
-import Header from './Others/Header.jsx'
-import { AuthContext } from './Auth/AuthProvider.jsx'
-import { useContext } from 'react'
-import { useState } from 'react'
-import { useEffect } from 'react'
 import Audit from './Pages/Audit.jsx'
+import { AuthContext } from './Auth/AuthProvider.jsx'
 
 const App = () => {
-
-   const [user, setuser] = useState(null)
+  const [user, setuser] = useState(null)
   const [loggedinuserdata, setloggedinuserdata] = useState(null)
   const Authdata = useContext(AuthContext)
 
+  // Check localStorage on initial load
   useEffect(() => {
     const loggedInUser = localStorage.getItem("loggedInUser")
-
     if (loggedInUser) {
       const userData = JSON.parse(loggedInUser)
       setuser(userData.role)
@@ -24,30 +20,52 @@ const App = () => {
     }
   }, [])
 
- const handleLogin = (username, password) => {
+  const handleLogin = (username, password) => {
     if (!Authdata) return;
 
-    const credentials = Authdata.find((e) => username == e.username && password == e.password)
+    const credentials = Authdata.find((e) => username === e.username && password === e.password)
+    
     if (credentials) {
-      setuser('testuser')
+      const role = 'testuser'
+      setuser(role)
       setloggedinuserdata(credentials)
-      localStorage.setItem('loggedInUser', JSON.stringify({ role: 'testuser', data: credentials }))
-      return;
+      localStorage.setItem('loggedInUser', JSON.stringify({ role: role, data: credentials }))
+    } else {
+      alert("Invalid Credentials")
     }
+  }
 
-    alert("Invalid Credentials")
+  const handleLogout = () => {
+    setuser(null)
+    setloggedinuserdata(null)
+    localStorage.removeItem('loggedInUser')
   }
 
   return (
-    <div>
-      {/* {!user ? <Login handleLogin={handleLogin} /> : ''}
-      {user == 'testuser' ? <Datafetch Changeuser = {setuser} data={loggedinuserdata} /> : null} */}
-      {/* <Login /> */}
-      {/* <Datafetch /> */}
-      {/* <Header/> */}
-      <Audit/>
+    <BrowserRouter>
+      <Routes>
+        {/* Login Route: If already logged in, redirect to Dashboard */}
+        <Route 
+          path="/login" 
+          element={!user ? <Login handleLogin={handleLogin} /> : <Navigate to="/dashboard" />} 
+        />
 
-    </div>
+        {/* Dashboard Route: Protected by user state */}
+        <Route 
+          path="/dashboard" 
+          element={user === 'testuser' ? <Datafetch changeuser={handleLogout} /> : <Navigate to="/login" />} 
+        />
+
+        {/* Audit Route: Protected, accepts dynamic employee ID */}
+        <Route 
+          path="/audit/:id" 
+          element={user === 'testuser' ? <Audit changeuser={handleLogout} /> : <Navigate to="/login" />} 
+        />
+
+        {/* Default Redirect */}
+        <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 

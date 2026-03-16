@@ -4,11 +4,6 @@ import { setlocalstorage } from '../Utils/Localstorage.jsx';
 
 
 const Header =(props) => {
-
-    const Logoutuser = () => {
-    localStorage.setItem('loggedinUser',' ')
-    props.Changeuser(' ')
-}
     return (
         <div className="flex justify-between items-center p-8 bg-[#111] border-b border-emerald-500/10">
             <div>
@@ -21,8 +16,14 @@ const Header =(props) => {
             </div>
             <button 
                 onClick={() => {
-                    localStorage.clear();
-                    props.Changeuser(null)
+                    // let the App.jsx logout handle clear the state
+                    if (props.changeuser) {
+                        props.changeuser();
+                    } else {
+                        // fallback if changeuser is not provided
+                        localStorage.removeItem('loggedInUser');
+                        window.location.href = '/login';
+                    }
                 }}
                 className="bg-red-500 hover:bg-red-600 text-white font-semibold px-6 py-2 rounded-lg transition-all active:scale-95 shadow-lg shadow-red-900/20"
             >
