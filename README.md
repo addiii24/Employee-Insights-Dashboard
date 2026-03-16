@@ -2,6 +2,25 @@
 
 This is a React-based 4-screen Employee Insights Dashboard built without any pre-made component libraries like MUI, Ant Design, or Bootstrap, relying entirely on raw Tailwind CSS for styling. It implements advanced concepts such as Custom Virtualization, native Camera API integration, HTML5 Canvas manipulation, and Geo-Spatial mapping.
 
+## 🚀 Running the Application
+To run this application locally, ensure you have Node.js installed, then execute the following commands in the root directory:
+
+```bash
+# 1. Install all dependencies
+npm install --legacy-peer-deps
+
+# 2. Start the Vite development server
+npm run dev
+```
+
+### Required Dependencies
+The following core packages are used in this project:
+- `react` & `react-dom`
+- `react-router-dom`: For application routing and navigation logic.
+- `tailwindcss` & `@tailwindcss/vite`: For all styling (Zero-UI library constraint).
+- `react-signature-canvas`: Used on the Audit page to render an HTML5 canvas for the user's digital signature.
+- `react-leaflet` & `leaflet`: Used on the Analytics page to render the interactive Geo-Spatial City Distribution Map.
+
 ## Features Completed
 1. **Secure Authentication:** Context API-based login system persisted via `localStorage`. Checks authentication state on route changes.
 2. **High-Performance Grid:** Uses custom-written virtualization math to handle the large API dataset exclusively rendering only viewport items.
