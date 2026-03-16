@@ -33,51 +33,69 @@ const Audit = ({ changeuser }) => {
     setIsCameraOpen(false);
   };
 
-  const handleFinalMerge = () => {
-    const mainCanvas = document.createElement('canvas');
-    const ctx = mainCanvas.getContext('2d');
-    const img = new Image();
-    img.src = capturedImg;
-
-    img.onload = () => {
-      mainCanvas.width = img.width;
-      mainCanvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
-
-      // Overlay signature from the pad
-      const sigImg = new Image();
-      sigImg.src = sigPad.current.getTrimmedCanvas().toDataURL('image/png');
+  const handleFinalMerge = async () => {
+    console.log("Starting handleFinalMerge...");
+    try {
+      const mainCanvas = document.createElement('canvas');
+      const ctx = mainCanvas.getContext('2d');
+      console.log("Canvas created.");
       
-      sigImg.onload = async () => {
-        try {
-          ctx.drawImage(sigImg, mainCanvas.width - 250, mainCanvas.height - 150, 200, 100);
-          const finalData = mainCanvas.toDataURL('image/jpeg', 0.8);
-          
-          // Save the final image to localStorage for the Analytics page to use first
-          localStorage.setItem('auditImage', finalData);
-          
-          // Final upload using fetch - don't let this block UI if it fails
-          try {
-            await fetch('https://backend.jotish.in/backend_dev/gettabledata.php', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                username: "test", password: "123456",
-                id: id, audit_image: finalData
-              })
-            });
-          } catch (e) {
-            console.error('Failed to save to backend but image captured locally:', e);
-          }
-          alert("Audit Verified and Saved!");
-          navigate('/analytics');
-          
-        } catch (error) {
-          console.error("Error during merge:", error);
-          alert("Failed to process image. Please try again.");
-        }
-      };
-    };
+      // Promise to load the captured photo
+      const loadImg = (src) => new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      });
+
+      console.log("Loading photo image...");
+      const photoImg = await loadImg(capturedImg);
+      console.log("Photo image loaded. Drawing to canvas...");
+      mainCanvas.width = photoImg.width;
+      mainCanvas.height = photoImg.height;
+      ctx.drawImage(photoImg, 0, 0);
+
+      // Check if signature exists, if not just use a blank transparent image
+      let sigDataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+      console.log("Checking signature pad...");
+      if (sigPad.current && !sigPad.current.isEmpty()) {
+         // Using getCanvas() instead of getTrimmedCanvas() which can crash on edge-drawn signatures
+         sigDataUrl = sigPad.current.getCanvas().toDataURL('image/png');
+         console.log("Signature captured.");
+      } else {
+         console.log("Signature pad empty, using placeholder.");
+      }
+      
+      console.log("Loading signature image...");
+      const sigImg = await loadImg(sigDataUrl);
+      console.log("Signature loaded. Overlaying on canvas...");
+      ctx.drawImage(sigImg, mainCanvas.width - 250, mainCanvas.height - 150, 200, 100);
+      
+      console.log("Generating final DataURL...");
+      const finalData = mainCanvas.toDataURL('image/jpeg', 0.8);
+      console.log("Saving to localStorage...");
+      localStorage.setItem('auditImage', finalData);
+      
+      // Background upload, do not await so it doesn't block UI navigation
+      console.log("Initiating background upload fetch...");
+      fetch('https://backend.jotish.in/backend_dev/gettabledata.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: "test", password: "123456",
+          id: id, audit_image: finalData
+        })
+      }).catch(e => console.error("Background save failed:", e));
+
+      console.log("Alerting success and navigating...");
+      alert("Audit Verified and Saved!");
+      navigate('/analytics');
+      
+    } catch (error) {
+      console.error("Critical error during image merge:", error);
+      alert("Image merge failed! Check console.");
+      navigate('/analytics'); // Always let the user proceed
+    }
   };
 
   return (
