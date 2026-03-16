@@ -17,7 +17,7 @@ const Datafetch = ({ changeuser }) => {
   const containerHeight = 500; // Fixed view window
   const buffer = 4;
   const itemsPerPage = 20;
-  
+
   const fetchEmployees = async (startIndex) => {
     try {
       const payload = {
@@ -52,7 +52,7 @@ const Datafetch = ({ changeuser }) => {
             startDate: emp[4],
             salary: emp[5].replace('$', '').replace(',', '')
           }));
-          
+
           setEmployees(prev => [...prev, ...formattedData]);
           setStart(prev => prev + itemsPerPage);
         }
@@ -90,7 +90,7 @@ const Datafetch = ({ changeuser }) => {
     }
   };
 
-  const filteredData = employees.filter(emp => 
+  const filteredData = employees.filter(emp =>
     emp.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -115,10 +115,10 @@ const Datafetch = ({ changeuser }) => {
             <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">Employee List</h2>
             <p className="mt-1 text-slate-500 dark:text-slate-400">Manage and view detailed information for all registered employees.</p>
           </div>
-          
+
           <div className="flex items-center gap-3">
             <div className="relative">
-              <input 
+              <input
                 type="text"
                 placeholder="Search employees..."
                 value={searchTerm}
@@ -142,7 +142,7 @@ const Datafetch = ({ changeuser }) => {
             </div>
 
             {/* Scrollable Virtual Container */}
-            <div 
+            <div
               onScroll={handleScroll}
               className="relative overflow-y-auto"
               style={{ height: `${containerHeight}px` }}
@@ -150,12 +150,12 @@ const Datafetch = ({ changeuser }) => {
               {/* Phantom Space for Scrollbar */}
               <div style={{ height: `${totalHeight}px`, position: 'relative' }}>
                 {/* Windowed Content */}
-                <div 
+                <div
                   className="absolute top-0 left-0 w-full"
                   style={{ transform: `translateY(${offsetY}px)` }}
                 >
                   {visibleSlice.map((emp, idx) => (
-                    <div 
+                    <div
                       key={emp.id || idx}
                       className="grid grid-cols-5 items-center px-6 border-b border-slate-100 dark:border-slate-800 hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors"
                       style={{ height: `${itemHeight}px` }}
@@ -186,7 +186,7 @@ const Datafetch = ({ changeuser }) => {
             <span className="text-sm text-slate-500">
               Showing {employees.length} employees {searchTerm && '(filtered)'}
             </span>
-            
+
             {loadingMore && (
               <div className="flex items-center gap-2 text-sm text-[#136dec] font-medium animate-pulse">
                 <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -196,7 +196,7 @@ const Datafetch = ({ changeuser }) => {
                 Buffering more data...
               </div>
             )}
-            
+
             {!hasMore && employees.length > 0 && (
               <span className="text-sm font-medium text-slate-400">All data loaded</span>
             )}
