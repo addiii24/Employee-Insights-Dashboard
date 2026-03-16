@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import SignatureCanvas from 'react-signature-canvas';
 import Header from '../Others/Header.jsx';
+import { Link } from 'react-router-dom';
 
 const Audit = ({ changeuser }) => {
   const { id } = useParams();
@@ -31,15 +32,40 @@ const Audit = ({ changeuser }) => {
     setIsCameraOpen(false);
   };
 
+  const handleFinalMerge = () => {
+    const mainCanvas = document.createElement('canvas');
+    const ctx = mainCanvas.getContext('2d');
+    const img = new Image();
+    img.src = capturedImg;
 
+    img.onload = () => {
+      mainCanvas.width = img.width;
+      mainCanvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
 
-
-
-   
+      // Overlay signature from the pad
+      const sigImg = new Image();
+      sigImg.src = sigPad.current.getTrimmedCanvas().toDataURL('image/png');
       
-
+      sigImg.onload = async () => {
+        ctx.drawImage(sigImg, mainCanvas.width - 250, mainCanvas.height - 150, 200, 100);
+        const finalData = mainCanvas.toDataURL('image/jpeg', 0.8);
         
-    
+        // Final upload using fetch
+        try {
+          await fetch('https://backend.jotish.in/backend_dev/gettabledata.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: "test", password: "123456",
+              id: id, audit_image: finalData
+            })
+          });
+          alert("Audit Verified and Saved!");
+        } catch (e) { console.error(e); }
+      };
+    };
+  };
 
   return (
     <div className="min-h-screen bg-[#101822] text-white">
@@ -65,7 +91,7 @@ const Audit = ({ changeuser }) => {
             <SignatureCanvas ref={sigPad} penColor="black" canvasProps={{ className: 'w-full h-48' }} />
           </div>
           <button onClick={handleFinalMerge} disabled={!capturedImg} className="w-full py-3 bg-indigo-600 rounded-lg font-bold">
-            Complete Audit
+          <Link to= {'/analytics'} > Complete Audit </Link>
           </button>
         </div>
       </div>
