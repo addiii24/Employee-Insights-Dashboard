@@ -4,6 +4,7 @@ import Login from './Pages/Login.jsx'
 import Datafetch from './Pages/Datafetch.jsx'
 import Audit from './Pages/Audit.jsx'
 import { AuthContext } from './Auth/AuthProvider.jsx'
+import Analytics from './Pages/Analytics.jsx'
 
 const App = () => {
   const [user, setuser] = useState(null)
@@ -62,9 +63,17 @@ const App = () => {
           element={user === 'testuser' ? <Audit changeuser={handleLogout} /> : <Navigate to="/login" />} 
         />
 
+        {/* Analytics Route : Protected */}
+        <Route
+          path="/analytics"
+          element={user === 'testuser' ? <Analytics changeuser={handleLogout} /> : <Navigate to="/login" />}
+        />
+
         {/* Default Redirect */}
         <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
       </Routes>
+
+
     </BrowserRouter>
   )
 }

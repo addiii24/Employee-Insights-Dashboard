@@ -20,6 +20,17 @@ const Audit = ({ changeuser }) => {
     }
   };
 
+  const capturePhoto = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
+    setCapturedImg(canvas.toDataURL('image/jpeg'));
+    
+    videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+    setIsCameraOpen(false);
+  };
+
 
 
 
