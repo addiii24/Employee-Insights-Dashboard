@@ -8,63 +8,7 @@ const Audit = ({ changeuser }) => {
   const [capturedImg, setCapturedImg] = useState(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const videoRef = useRef(null);
-  const sigPad = useRef({});
-
-  const startCamera = async () => {
-    setIsCameraOpen(true);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      videoRef.current.srcObject = stream;
-    } catch (err) {
-      alert("Please allow camera access.");
-    }
-  };
-
-  const capturePhoto = () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
-    setCapturedImg(canvas.toDataURL('image/jpeg'));
-    
-    videoRef.current.srcObject.getTracks().forEach(track => track.stop());
-    setIsCameraOpen(false);
-  };
-
-  const handleFinalMerge = () => {
-    const mainCanvas = document.createElement('canvas');
-    const ctx = mainCanvas.getContext('2d');
-    const img = new Image();
-    img.src = capturedImg;
-
-    img.onload = () => {
-      mainCanvas.width = img.width;
-      mainCanvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
-
-      // Overlay signature from the pad
-      const sigImg = new Image();
-      sigImg.src = sigPad.current.getTrimmedCanvas().toDataURL('image/png');
-      
-      sigImg.onload = async () => {
-        ctx.drawImage(sigImg, mainCanvas.width - 250, mainCanvas.height - 150, 200, 100);
-        const finalData = mainCanvas.toDataURL('image/jpeg', 0.8);
-        
-        // Final upload using fetch
-        try {
-          await fetch('https://backend.jotish.in/backend_dev/gettabledata.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              username: "test", password: "123456",
-              id: id, audit_image: finalData
-            })
-          });
-          alert("Audit Verified and Saved!");
-        } catch (e) { console.error(e); }
-      };
-    };
-  };
+  const sigPad = useRef({}); 
 
   return (
     <div className="min-h-screen bg-[#101822] text-white">
