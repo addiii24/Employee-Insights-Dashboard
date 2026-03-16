@@ -8,7 +8,27 @@ const Audit = ({ changeuser }) => {
   const [capturedImg, setCapturedImg] = useState(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const videoRef = useRef(null);
-  const sigPad = useRef({}); 
+  const sigPad = useRef({});
+
+  const startCamera = async () => {
+    setIsCameraOpen(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      videoRef.current.srcObject = stream;
+    } catch (err) {
+      alert("Please allow camera access.");
+    }
+  };
+
+
+
+
+
+   
+      
+
+        
+    
 
   return (
     <div className="min-h-screen bg-[#101822] text-white">
